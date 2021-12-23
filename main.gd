@@ -11,6 +11,7 @@ func get_parameter(parameter):
 	return null
 
 func _ready():
+	# Trigger resize() function when window is resized
 	get_tree().get_root().connect("size_changed", self, "resize")
 	
 	var url = get_parameter("url")
@@ -27,6 +28,13 @@ func _ready():
 	var http_error = http_request.request(url)
 	if http_error != OK:
 		print("An error occurred in the HTTP request")
+	
+	# Update pixel shader
+	var pixel_size = get_parameter("pixel-size")
+	if pixel_size == null:
+		pixel_size = 10.0
+	pixel_size = clamp(float(pixel_size), 1.0, 100.0)
+	get_node("ColorRect").material.set_shader_param("pixel_size", pixel_size)
 
 # Called when the HTTP request is completed
 func _http_request_completed(result, response_code, headers, body):
