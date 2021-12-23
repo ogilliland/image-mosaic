@@ -1,3 +1,6 @@
+# Misc. ignores
+.DS_Store
+build/
 
 # Godot-specific ignores
 .import/
