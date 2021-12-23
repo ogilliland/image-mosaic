@@ -1,5 +1,7 @@
 extends Control
 
+var image_size: Vector2
+
 func get_parameter(parameter):
 	if OS.has_feature("JavaScript"):
 		return JavaScript.eval(
@@ -9,6 +11,8 @@ func get_parameter(parameter):
 	return null
 
 func _ready():
+	get_tree().get_root().connect("size_changed", self, "resize")
+	
 	var url = get_parameter("url")
 	if url == null:
 		url = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Mona_Lisa.jpg/396px-Mona_Lisa.jpg"
@@ -45,8 +49,26 @@ func _http_request_completed(result, response_code, headers, body):
 	if image_error != OK:
 		print("An error occurred while trying to display the image")
 	
+	image_size = image.get_size()
+	
 	var texture = ImageTexture.new()
 	texture.create_from_image(image)
 	
 	# Assign to the child TextureRect node
 	get_node("CenterContainer/TextureRect").texture = texture
+	resize()
+
+func resize():
+	var size = OS.get_real_window_size()
+	var scale = size / image_size
+	var object_fit = get_parameter("object-fit")
+	if object_fit == null:
+		object_fit = "cover"
+	match object_fit:
+		"contain":
+			scale = min(scale.x, scale.y)
+		_, "cover":
+			scale = max(scale.x, scale.y)
+	var texture_rect = get_node("CenterContainer/TextureRect")
+	texture_rect.rect_min_size = image_size * scale
+	texture_rect.rect_size = texture_rect.rect_min_size
