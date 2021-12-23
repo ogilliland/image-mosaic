@@ -32,8 +32,8 @@ func _ready():
 	# Update pixel shader
 	var pixel_size = get_parameter("pixel-size")
 	if pixel_size == null:
-		pixel_size = 10.0
-	pixel_size = clamp(float(pixel_size), 1.0, 100.0)
+		pixel_size = 20.0
+	pixel_size = clamp(float(pixel_size), 4.0, 100.0)
 	get_node("ColorRect").material.set_shader_param("pixel_size", pixel_size)
 
 # Called when the HTTP request is completed
