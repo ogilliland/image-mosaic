@@ -1,6 +1,7 @@
 extends Control
 
 var image_size: Vector2
+var pixel_size
 
 func get_parameter(parameter):
 	if OS.has_feature("JavaScript"):
@@ -30,7 +31,7 @@ func _ready():
 		print("An error occurred in the HTTP request")
 	
 	# Update pixel shader
-	var pixel_size = get_parameter("pixel-size")
+	pixel_size = get_parameter("pixel-size")
 	if pixel_size == null:
 		pixel_size = 20.0
 	pixel_size = clamp(float(pixel_size), 4.0, 100.0)
@@ -67,7 +68,7 @@ func _http_request_completed(result, response_code, headers, body):
 	resize()
 
 func resize():
-	var size = OS.get_real_window_size()
+	var size = rect_size
 	var scale = size / image_size
 	var object_fit = get_parameter("object-fit")
 	if object_fit == null:
@@ -80,3 +81,10 @@ func resize():
 	var texture_rect = get_node("CenterContainer/TextureRect")
 	texture_rect.rect_min_size = image_size * scale
 	texture_rect.rect_size = texture_rect.rect_min_size
+	
+	var num_pixels = Vector2(
+		floor(size.x / pixel_size),
+		floor(size.y / pixel_size)
+	)
+	var delta = size - num_pixels * pixel_size
+	get_node("ColorRect").material.set_shader_param("border", 0.5 * delta)
